@@ -1,0 +1,4 @@
+#include "resource.h"
+
+APP_ICON   ICON   "app.ico"
+
