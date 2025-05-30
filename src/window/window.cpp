@@ -88,7 +88,8 @@ BOOL OnEnumWindows(HWND hWnd, const LPARAM lParam) {
     return TRUE;
 }
 
-std::vector<WinInfo> GetChildrenWindow(const HWND parent, const int depth, const int maxDepth) {
+// ReSharper disable once CppParameterMayBeConst
+std::vector<WinInfo> GetChildrenWindow(HWND parent, const int depth, const int maxDepth) { // NOLINT(*-no-recursion)
     std::vector<WinInfo> list;
     if (depth < maxDepth) {
         EnumChildWindows(parent, OnEnumWindows, reinterpret_cast<LPARAM>(&list));
