@@ -60,7 +60,7 @@ public:
     }
 
     void onDrawForeground(SkCanvas& canvas) override {
-        auto rect = HasContent(state.selectedRect) ? state.dstRect() : state.selectWindow().rect;
+        auto rect = HasContent(state.selectedRect) ? state.dstRect() : state.selectWindow(state.selectDepth).rect;
         drawRect(canvas, rect);
         state.dashOffset += 0.5;
         state.redraw();
@@ -280,7 +280,7 @@ public:
                 state.cursorType = CaptureState::CURSOR_NONE;
                 state.selectedRect.sort();
             } else {
-                state.selectedRect = state.selectWindow().rect;
+                state.selectedRect = state.selectWindow(state.selectDepth).rect;
             }
 
             state.actionType = CaptureState::ACTION_TYPE_NONE;
@@ -335,6 +335,14 @@ public:
             SetCursorPos(p.x, p.y + 1);
             break;
         }
+        case VK_OEM_PLUS:
+            if (state.selectDepth < 5)
+                state.selectDepth++;
+            break;
+        case VK_OEM_MINUS:
+            if (state.selectDepth > 0)
+                state.selectDepth--;
+            break;
         default:
             break;
         }
@@ -742,17 +750,26 @@ void CaptureState::onFocus(const bool focus) {
     }
 }
 
-WinInfo CaptureState::selectWindow(const bool translate) const {
+WinInfo CaptureState::selectWindow(const int maxDepth, const bool translate) const {
     POINT pos;
     GetCursorPos(&pos);
 
     WinInfo r = {nullptr, SkIRect(desktopRect)};
-    for (auto info : windowInfos) {
+    auto infos = &windowInfos;
+    int depth = 0;
+
+loop:
+    for (const WinInfo& info : *infos) {
         if (info.rect.contains(pos.x, pos.y)) {
+            depth++;
             r = info;
+            infos = &info.children;
+            if (depth < maxDepth)
+                goto loop;
             break;
         }
     }
+
     if (translate) {
         r.rect.offset(-desktopRect.fLeft, -desktopRect.fTop);
     }

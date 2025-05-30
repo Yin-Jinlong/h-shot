@@ -87,6 +87,8 @@ public:
     std::vector<SkIRect> screenRects;
     std::vector<WinInfo> windowInfos;
 
+    int selectDepth = 5;
+
     explicit CaptureState();
     ~CaptureState() override;
 
@@ -121,8 +123,9 @@ public:
 
     /**
      * 选择鼠标处Rect
+     * @param maxDepth 搜索最大深度，0表示只顶级
      * @param translate 是否转换到程序的坐标
      * @return
      */
-    WinInfo selectWindow(bool translate = true) const;
+    WinInfo selectWindow(int maxDepth, bool translate = true) const;
 };

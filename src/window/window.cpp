@@ -72,23 +72,34 @@ std::vector<SkIRect> Window::getDesktopRects() {
     return list;
 }
 
+std::vector<WinInfo> GetChildrenWindow(HWND parent, int depth, int maxDepth);
+
 // ReSharper disable once CppParameterMayBeConst
 BOOL OnEnumWindows(HWND hWnd, const LPARAM lParam) {
     if (IsWindowVisible(hWnd)) {
         const auto list = reinterpret_cast<std::vector<WinInfo>*>(lParam);
         RECT rect;
         GetWindowRect(hWnd, &rect);
-        if (rect.right - rect.left > 1 && rect.bottom - rect.top > 2)
-            list->push_back({.hwnd = hWnd, .rect = SkIRect::MakeLTRB(rect.left, rect.top, rect.right, rect.bottom)});
+        if (rect.right - rect.left > 1 && rect.bottom - rect.top > 2) {
+            WinInfo info = {.hwnd = hWnd, .rect = SkIRect::MakeLTRB(rect.left, rect.top, rect.right, rect.bottom)};
+            list->push_back(info);
+        }
     }
     return TRUE;
 }
 
-std::vector<WinInfo> Window::getWindowRects() {
+std::vector<WinInfo> GetChildrenWindow(const HWND parent, const int depth, const int maxDepth) {
     std::vector<WinInfo> list;
-    EnumWindows(OnEnumWindows, reinterpret_cast<LPARAM>(&list));
+    if (depth < maxDepth) {
+        EnumChildWindows(parent, OnEnumWindows, reinterpret_cast<LPARAM>(&list));
+        for (auto& info : list) {
+            info.children = GetChildrenWindow(info.hwnd, depth + 1, maxDepth);
+        }
+    }
     return list;
 }
+
+std::vector<WinInfo> Window::getWindowRects() { return GetChildrenWindow(nullptr, 0, 5); }
 
 SkIRect Window::getDesktopRect(const std::vector<SkIRect>& rects) {
     SkIRect rect;

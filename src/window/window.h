@@ -11,6 +11,7 @@ struct WinInfo
 {
     HWND hwnd;
     SkIRect rect;
+    std::vector<WinInfo> children;
 };
 
 class Window
