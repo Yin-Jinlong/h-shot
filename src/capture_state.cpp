@@ -696,7 +696,7 @@ void CaptureState::show() {
     capture();
     _window->show();
     _window->setRect(rect, HWND_TOPMOST);
-    SetFocus(_window->hWnd());
+    SetForegroundWindow(_window->hWnd());
 }
 
 void CaptureState::hide() {
@@ -746,7 +746,7 @@ void CaptureState::onCustomMessage(const WPARAM wParam, const LPARAM lParam) {
 void CaptureState::onFocus(const bool focus) {
     if (_window->isVisible() && !focus) {
         _window->setOrder(HWND_TOPMOST);
-        SetFocus(_window->hWnd());
+        SetForegroundWindow(_window->hWnd());
     }
 }
 
