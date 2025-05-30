@@ -3,6 +3,7 @@
 //
 
 #include "window.h"
+#include "dwmapi.h"
 
 #include <glad/glad.h>
 #include <include/gpu/ganesh/gl/GrGLBackendSurface.h>
@@ -80,8 +81,17 @@ BOOL OnEnumWindows(HWND hWnd, const LPARAM lParam) {
         const auto list = reinterpret_cast<std::vector<WinInfo>*>(lParam);
         RECT rect;
         GetWindowRect(hWnd, &rect);
-        if (rect.right - rect.left > 1 && rect.bottom - rect.top > 2) {
-            WinInfo info = {.hwnd = hWnd, .rect = SkIRect::MakeLTRB(rect.left, rect.top, rect.right, rect.bottom)};
+        if (!IsIconic(hWnd) && rect.right - rect.left > 1 && rect.bottom - rect.top > 2) {
+            // DWM窗口
+            if (const auto exStyle = GetWindowLong(hWnd, GWL_EXSTYLE);
+                (exStyle & WS_EX_NOREDIRECTIONBITMAP) == WS_EX_NOREDIRECTIONBITMAP) {
+                BOOL cloaked = true;
+                DwmGetWindowAttribute(hWnd, DWMWA_CLOAKED, &cloaked, sizeof(cloaked));
+                if (cloaked)
+                    return TRUE;
+            }
+            const WinInfo info = {
+                .hwnd = hWnd, .rect = SkIRect::MakeLTRB(rect.left, rect.top, rect.right, rect.bottom)};
             list->push_back(info);
         }
     }

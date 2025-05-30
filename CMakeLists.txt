@@ -43,6 +43,7 @@ else ()
 endif ()
 
 target_link_libraries(h-shot
+        Dwmapi
         opengl32
         skia
 )
