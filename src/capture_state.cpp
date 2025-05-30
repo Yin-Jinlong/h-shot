@@ -722,24 +722,30 @@ void CaptureState::onTray(const TryMenuItemId id) {
         break;
     }
 }
+void CaptureState::onActive(WPARAM wParam, LPARAM lParam) {
+    if (!LOWORD(wParam)) {
+    }
+}
 
-void CaptureState::onCustomMessage(const WPARAM wParam, const LPARAM lParam) {
-    POINT pt;
-    GetCursorPos(&pt);
-    switch (lParam) {
-    case WM_HOTKEY:
-        onHotKey(static_cast<HotKey>(wParam));
-        break;
-    case WM_LBUTTONDOWN:
-        onTray(TMI_OPEN);
-        break;
-    case WM_RBUTTONDOWN:
-        onTray(
-            static_cast<TryMenuItemId>(
-                TrackPopupMenuEx(_tray_menu, TPM_RETURNCMD, pt.x, pt.y, _window->hWnd(), nullptr)));
-        break;
-    default:
-        break;
+void CaptureState::onCustomMessage(UINT msg, const WPARAM wParam, const LPARAM lParam) {
+    if (msg == WM_USER) {
+        POINT pt;
+        GetCursorPos(&pt);
+        switch (lParam) {
+        case WM_HOTKEY:
+            onHotKey(static_cast<HotKey>(wParam));
+            break;
+        case WM_LBUTTONDOWN:
+            onTray(TMI_OPEN);
+            break;
+        case WM_RBUTTONDOWN:
+            onTray(
+                static_cast<TryMenuItemId>(
+                    TrackPopupMenuEx(_tray_menu, TPM_RETURNCMD, pt.x, pt.y, _window->hWnd(), nullptr)));
+            break;
+        default:
+            break;
+        }
     }
 }
 

@@ -30,6 +30,7 @@ class RootState : public State
 public:
     virtual void onCreate(Window* window) = 0;
     virtual void onCreated() = 0;
-    virtual void onCustomMessage(WPARAM wParam, LPARAM lParam) = 0;
+    virtual void onActive(WPARAM wParam, LPARAM lParam) = 0;
+    virtual void onCustomMessage(UINT msg, WPARAM wParam, LPARAM lParam) = 0;
     virtual void onFocus(bool focus) = 0;
 };

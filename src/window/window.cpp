@@ -222,6 +222,9 @@ sk_sp<SkSurface> Window::surface() const { return _surface; }
 
 LRESULT Window::proc(const UINT msg, const WPARAM wParam, const LPARAM lParam) {
     switch (msg) {
+    case WM_ACTIVATE:
+        _state->onActive(wParam, lParam);
+        break;
     case WM_SIZE:
         resize(LOWORD(lParam), HIWORD(lParam));
         break;
@@ -291,11 +294,11 @@ LRESULT Window::proc(const UINT msg, const WPARAM wParam, const LPARAM lParam) {
         PostQuitMessage(0);
         break;
     case WM_HOTKEY:
-        _state->onCustomMessage(wParam, msg);
+        _state->onCustomMessage(WM_USER, wParam, msg);
         break;
     default:
         if (msg >= WM_USER) {
-            _state->onCustomMessage(wParam, lParam);
+            _state->onCustomMessage(msg, wParam, lParam);
             break;
         }
         return DefWindowProc(_h_wnd, msg, wParam, lParam);
@@ -325,7 +328,8 @@ void Window::setOrder(HWND order) const { SetWindowPos(_h_wnd, order, 0, 0, 0, 0
 bool Window::isVisible() const { return IsWindowVisible(_h_wnd); }
 
 void Window::render() {
-    wglMakeCurrent(_hdc, _h_gl_rc);
+    if (!wglMakeCurrent(_hdc, _h_gl_rc))
+        return;
     const auto canvas = _surface->getCanvas();
 
     delete _view;

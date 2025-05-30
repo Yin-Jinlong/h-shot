@@ -117,7 +117,9 @@ public:
 
     void onTray(TryMenuItemId id);
 
-    void onCustomMessage(WPARAM wParam, LPARAM lParam) override;
+    void onActive(WPARAM wParam, LPARAM lParam) override;
+
+    void onCustomMessage(UINT msg, WPARAM wParam, LPARAM lParam) override;
 
     void onFocus(bool focus) override;
 
