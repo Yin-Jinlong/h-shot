@@ -274,11 +274,15 @@ LRESULT Window::proc(const UINT msg, const WPARAM wParam, const LPARAM lParam) {
     case WM_KEYDOWN:
         if (_view)
             _view->dispatchKeyDown(wParam);
+        if (msg == WM_SYSKEYDOWN)
+            return DefWindowProc(_h_wnd, msg, wParam, lParam);
         break;
     case WM_SYSKEYUP:
     case WM_KEYUP:
         if (_view)
             _view->dispatchKeyUp(wParam);
+        if (msg == WM_SYSKEYUP)
+            return DefWindowProc(_h_wnd, msg, wParam, lParam);
         break;
     case WM_CLOSE:
         DestroyWindow(_h_wnd);
