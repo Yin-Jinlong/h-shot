@@ -248,10 +248,12 @@ LRESULT Window::proc(const UINT msg, const WPARAM wParam, const LPARAM lParam) {
         if (_view)
             _view->dispatchMouseUp(SkIPoint::Make(GET_X_LPARAM(lParam), GET_Y_LPARAM(lParam)), MOUSE_RIGHT);
         break;
+    case WM_SYSKEYDOWN:
     case WM_KEYDOWN:
         if (_view)
             _view->dispatchKeyDown(wParam);
         break;
+    case WM_SYSKEYUP:
     case WM_KEYUP:
         if (_view)
             _view->dispatchKeyUp(wParam);
